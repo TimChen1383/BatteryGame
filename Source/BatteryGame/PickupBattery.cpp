@@ -15,6 +15,9 @@ APickupBattery::APickupBattery()
 	//Creat battery mesh
 	PickUpBattery = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickUpBatteryMesh"));
 	RootComponent = PickUpBattery;
+
+	//Enable simulate physics
+	GetMesh()->SetSimulatePhysics(true);
 }
 
 // Called when the game starts or when spawned
