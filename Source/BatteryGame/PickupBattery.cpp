@@ -46,3 +46,10 @@ void APickupBattery::SetActive(bool NewActiveState)
 	bIsActivate = NewActiveState;
 }
 
+void APickupBattery::WasCollected()
+{
+	Destroy();
+}
+
+
+

@@ -52,5 +52,6 @@ public:
 	float SpawnDelay;
 
 	void SpawnBattery();
+	
 
 };

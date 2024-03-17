@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "PickupBattery.h"
+#include "Components/SphereComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -50,6 +52,11 @@ ABatteryGameCharacter::ABatteryGameCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	//Create Collection Sphere
+	CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
+	CollectionSphere->SetupAttachment(RootComponent);
+	CollectionSphere->SetSphereRadius(200.0f);
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -69,6 +76,38 @@ void ABatteryGameCharacter::BeginPlay()
 	}
 }
 
+//Collect Pickup Batteries in the collide sphere when we press the key
+void ABatteryGameCharacter::CollectPickupBattery()
+{
+	//Get all overlapping actors and store them in array
+	TArray<AActor*>CollectedActors;
+	CollectionSphere->GetOverlappingActors(CollectedActors);
+
+	//For each actor we collected
+	for(int iCollect = 0; iCollect<CollectedActors.Num();++iCollect)
+	{
+		//Cast to Pickup Battery
+		APickupBattery* const TestPickupBattery = Cast<APickupBattery>(CollectedActors[iCollect]);
+
+		//If cast succeed, pickup is valid
+		if(TestPickupBattery && !TestPickupBattery->IsPendingKill() && TestPickupBattery->IsActive())
+		{
+			//Call the Pickup Battery actor's Was Collected function
+			TestPickupBattery->WasCollected();
+			//Deactivate the Pickup Battery actor
+			TestPickupBattery->SetActive(false);
+		}
+
+		
+
+		
+	}
+
+
+	
+	
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -78,14 +117,17 @@ void ABatteryGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABatteryGameCharacter::Move);
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABatteryGameCharacter::Look);
+
+		//Collecting Pickup Battery
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ABatteryGameCharacter::CollectPickupBattery);
 	}
 	else
 	{

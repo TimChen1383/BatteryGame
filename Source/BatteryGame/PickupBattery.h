@@ -35,9 +35,13 @@ public:
 	void SetActive(bool NewActiveState);
 
 	
-	//Static mesh that represent the battery - if I make it read only, how can I change it in BP?
+	//Static mesh that represent the battery
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Battery")
 	class UStaticMeshComponent* PickUpBattery;
+
+	//Add collect custom event. Cll the event when this object has been collected
+	UFUNCTION(BlueprintCallable)
+	void WasCollected();
 
 
 protected:

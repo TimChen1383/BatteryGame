@@ -43,6 +43,12 @@ class ABatteryGameCharacter : public ACharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
+	
+	
+	
+	//Collection Sphere
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category=Camera,  meta = (AllowPrivateAccess = "true"))
+	class USphereComponent* CollectionSphere;
 
 public:
 	ABatteryGameCharacter();
@@ -69,5 +75,12 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	//Return Collection Sphere subobject
+	FORCEINLINE class USphereComponent* GetCollectionSphere() const { return CollectionSphere; }
+
+	//Collect Pickup Batteries in the collide sphere when we press the key
+	UFUNCTION(BlueprintCallable, Category = "PickupBatteru")
+	void CollectPickupBattery();
 };
 
